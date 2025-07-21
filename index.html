@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task Mood Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center py-10">
+
+  <h1 class="text-2xl font-bold mb-4">Task Mood Fusion Tracker</h1>
+
+  <div class="flex space-x-2 mb-4">
+    <input id="taskInput" type="text" placeholder="Your task..." class="border p-2 rounded w-64" />
+    <select id="moodInput" class="border p-2 rounded">
+      <option value="happy">😄 Happy</option>
+      <option value="neutral">😐 Neutral</option>
+      <option value="stressed">😩 Stressed</option>
+    </select>
+    <button id="addBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Add</button>
+  </div>
+
+  <ul id="taskList" class="space-y-2 w-80"></ul>
+
+  <script>
+    const taskInput = document.getElementById('taskInput');
+    const moodInput = document.getElementById('moodInput');
+    const taskList = document.getElementById('taskList');
+    const addBtn = document.getElementById('addBtn');
+
+    const moods = {
+      happy: 'bg-green-200',
+      neutral: 'bg-yellow-200',
+      stressed: 'bg-red-200',
+    };
+
+    function loadTasks() {
+      const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+      taskList.innerHTML = '';
+      tasks.forEach(({ task, mood, time }) => {
+        const li = document.createElement('li');
+        li.className = `p-3 rounded ${moods[mood]} relative group`;
+        li.textContent = task;
+        const tooltip = document.createElement('div');
+        tooltip.className = 'absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 p-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition';
+        tooltip.textContent = `Mood: ${mood} at ${new Date(time).toLocaleTimeString()}`;
+        li.appendChild(tooltip);
+        taskList.appendChild(li);
+      });
+    }
+
+    addBtn.onclick = () => {
+      const task = taskInput.value.trim();
+      const mood = moodInput.value;
+      if (!task) return;
+      const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+      tasks.push({ task, mood, time: new Date() });
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      taskInput.value = '';
+      loadTasks();
+    };
+
+    loadTasks();
+  </script>
+</body>
+</html>
